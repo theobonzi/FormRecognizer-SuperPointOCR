@@ -13,26 +13,26 @@ Le script principal du projet est exécuté à partir de la ligne de commande et
 Pour lancer le preprocess, utilisez l'option `-preprocess` suivie du chemin vers vos données. Par exemple:
 
 ```bash
-python main.py -preprocess chemin/vers/donnees
+python run.py -preprocess chemin/vers/donnees
 ```
 
 Si vous souhaitez forcer l'exécution du preprocess, utilisez l'option --force:
 
 ```bash
-python main.py -preprocess chemin/vers/donnees --force
+python run.py -preprocess chemin/vers/donnees --force
 ```
 
 ### Inference
 Pour effectuer une inférence, utilisez l'option -inference suivie du chemin vers vos données. Par exemple:
 
 ```bash
-python main.py -inference chemin/vers/donnees
+python run.py -inference chemin/vers/donnees
 ```
 
 Pour activer le benchmark pendant l'inférence, ajoutez l'option -benchmark:
 
 ```bash
-python main.py -inference chemin/vers/donnees -benchmark
+python run.py -inference chemin/vers/donnees -benchmark
 ```
 
 Notez que l'option -benchmark ne peut être utilisée qu'avec -inference.
