@@ -1,7 +1,13 @@
 import cv2
 import numpy as np
 import time
-from src.process.process import process_single_image, resise_image
+import re
+import os
+import contextlib
+import io
+import pandas as pd
+from src.process.process import process_single_image, resise_image, display_images, choose_good_excel, append_df_to_excel, get_paths_dict
+from src.ocr.ocr_process import draw_boxes
 from src.process.train_process import load_models
 from src.superpoint.superpoint import initialize_superpoint
 
@@ -70,3 +76,58 @@ def inference(test_image_path, path_models):
     print(f"==> Inference phase completed. Total time taken: {time.time() - start_time:.2f} seconds.")  
 
     return best_matching_form, keypoints, img
+
+def run_all(path_model, ocr, nb_forms=20, nb_ocr=5, verbose=False):
+    counter = 0
+
+    dict_spi_path = get_paths_dict()
+
+    df =None
+
+    for spi, path_recto in dict_spi_path.items():
+        if counter >= nb_forms:
+            break
+
+        path_verso = re.sub(r'_R\.jpg$', '_V.jpg', path_recto)
+
+        print(spi)
+        new_recto = os.path.join('../../Data/POC/', path_recto)
+        new_verso = os.path.join('../../Data/POC/', path_verso)
+        print(f'Recto: {path_recto} | File exist: {os.path.exists(new_recto)}')
+        print(f'Recto: {path_verso} | File exist: {os.path.exists(new_verso)}')
+
+        #Todo Inference on new_recto and new_verso
+        ##RECTO
+        temp_stdout = io.StringIO()
+        with contextlib.redirect_stdout(temp_stdout):
+            match_form_R, keypoints_R, image_R = inference(test_image_path=new_recto, path_models=path_model)
+            match_form_V, keypoints_V, image_V = inference(test_image_path=new_verso, path_models=path_model)
+
+        if 'recto' not in match_form_R or 'verso' not in match_form_V:
+            raise ValueError("Error: Either 'recto' or 'verso' not found.")
+        else:
+            print('Good superpoint')        
+            
+        print(match_form_R)
+
+        if match_form_R != '2042_Kauto_recto':
+            #Todo OCR
+            #with contextlib.redirect_stdout(temp_stdout):
+            print(ocr)
+            img_R, strings_R, df_R = draw_boxes(ocr, image_R, match_form_R, nb_ocr)
+            img_V, strings_V, df_V = draw_boxes(ocr, image_V, match_form_V, nb_ocr)
+
+            if verbose:
+                display_images(img_R, img_V, title1=match_form_R, title2=match_form_V)
+
+            #Todo Concatener les 2 resultats dans 1 seul dataframe avec les bons labels
+            df_concatenated = pd.concat([df_R.reset_index(drop=True), df_V.reset_index(drop=True)], axis=1)
+            df = df_concatenated
+
+            sheet_name = choose_good_excel(match_form_R)
+
+            #Todo Remplir le bon excel
+            append_df_to_excel(df_concatenated, excel_path='./data/excel/Acquisition.xlsx', sheet_name=sheet_name)
+
+            counter += 1
+    return df

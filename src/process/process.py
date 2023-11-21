@@ -7,6 +7,8 @@ import time
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+import pandas as pd
+from openpyxl import load_workbook
 
 def resise_image(image, scale_percent=40):
     """Resize an image to a given scale."""
@@ -74,3 +76,131 @@ def process_form_folder(form_folder_path, superpoint):
     print(f"==> Finished processing form folder. Time taken: {time.time() - start_time:.2f} seconds.")
     
     return keypoints_list, descriptors_list, desc_ref, kp_ref
+
+def choose_good_excel(match_form):
+    if '2042_K_' in match_form:
+        return '2042K'
+    elif '2042_Kauto' in match_form:
+        return '2042KAUTO'
+    else:
+        return '2042'
+    
+def display_images(img1, img2, title1='Image 1', title2='Image 2'):
+    """
+    Display two images side by side using matplotlib
+
+    :param img1: First image to display
+    :param img2: Second image to display
+    :param title1: Title of the first image
+    :param title2: Title of the second image
+    """
+    
+    fig, axs = plt.subplots(1, 2, figsize=(20, 10))  # Create a figure and a set of subplots
+    
+    axs[0].imshow(img1, cmap='gray')  # Display the first image
+    axs[0].axis('off')  # Hide axes
+    axs[0].set_title(title1)  # Set title of the first image
+    
+    axs[1].imshow(img2, cmap='gray')  # Display the second image
+    axs[1].axis('off')  # Hide axes
+    axs[1].set_title(title2)  # Set title of the second image
+    
+    plt.tight_layout()  # Ensure the plots are displayed neatly without overlapping
+    plt.show()  # Display the images
+
+def append_df_to_excel(df, excel_path, sheet_name):
+    # Charger le classeur
+    workbook = load_workbook(excel_path)
+    # Sélectionner la feuille de calcul
+    sheet = workbook[sheet_name]
+    
+    # Trouver la dernière rangée pour chaque colonne
+    max_row_by_col = {}
+    for column in df:
+        # Supposons que les colonnes dans le DataFrame correspondent aux entêtes des colonnes dans Excel
+        max_row_by_col[column] = sheet.max_row
+    
+    # Obtenir les valeurs à ajouter depuis le DataFrame
+    for column in df:
+        # Obtenir la première rangée vide pour la colonne
+        row = max_row_by_col[column] + 1
+        # Obtenir la valeur à ajouter - on suppose qu'il y a une seule valeur par colonne dans le DataFrame
+        value = df.at[0, column]  # Obtient la valeur de la première rangée pour la colonne actuelle
+        if pd.notna(value):  # Vérifier si la valeur n'est pas NaN
+            # Mettre à jour la cellule dans le fichier Excel
+            sheet[f"{column}{row}"] = value
+    
+    # Sauvegarder le classeur
+    workbook.save(excel_path)
+
+def create_paths(df):
+    """
+    Creates a dictionary where each key is a concatenated path from 'Lot' and 'Image' columns
+    and each value is the corresponding 'SPI' value, filtering out rows where 'SPI' is '0000000000000'.
+    
+    :param df: DataFrame
+        Input DataFrame to be processed.
+    :return: dict
+        A dictionary containing paths as keys and 'SPI' values as values.
+    """
+    paths_dict = {}
+    try:
+        # Iterating over rows in the DataFrame
+        for index, row in df.iterrows():
+            if row['SPI'] != '0000000000000':
+                # Concatenating 'Lot' and 'Image' values using os.path.join
+                path = os.path.join(str(row['Lot']), str(row['Image']))
+                paths_dict[row['SPI']] = path
+
+                
+    except KeyError as e:
+        print(f"Error: Column not found in the DataFrame: {e}")
+    except Exception as e:
+        print(f"An error occurred while processing the DataFrame: {e}")
+        
+    return paths_dict
+
+def load_file_into_dataframe(file_path):
+    """
+    Load an Excel or ODS file into a DataFrame.
+    
+    :param file_path: str
+        Path to the file to be loaded.
+    :return: DataFrame or None
+        Returns a DataFrame if successful, otherwise None.
+    """
+    try:
+        # Loading Excel file
+        if file_path.endswith('.xlsx'):
+            df = pd.read_excel(file_path, engine='openpyxl')
+        # Loading ODS file
+        elif file_path.endswith('.ods'):
+            df = pd.read_excel(file_path, engine='odf')
+        else:
+            print("Error: Unsupported file format. Please provide an .ods or .xlsx file.")
+            return None
+        
+        return df
+    
+    except FileNotFoundError:
+        print(f"Error: The file '{file_path}' does not exist.")
+    except PermissionError:
+        print(f"Error: Permission denied to access the file '{file_path}'.")
+    except Exception as e:
+        print(f"An error occurred while loading the file: {e}")
+
+def get_paths_dict(path=None, verbose=False):
+
+    if path is None:
+        path = '../../Data/POC/table_correspondance_90pourcents.ods'
+
+    df = load_file_into_dataframe(path)
+
+    paths_dict = create_paths(df)
+
+    if verbose:
+        print(len(paths_dict))
+        for spi, path in paths_dict.items():
+            print(f"SPI: {spi}, Path: {path}")
+    
+    return paths_dict

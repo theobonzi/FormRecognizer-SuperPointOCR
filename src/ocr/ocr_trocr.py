@@ -4,10 +4,11 @@ from PIL import Image, ImageDraw
 from transformers import TrOCRProcessor, VisionEncoderDecoderModel
 import concurrent.futures
 
-processor = TrOCRProcessor.from_pretrained("microsoft/trocr-base-handwritten")
-model = VisionEncoderDecoderModel.from_pretrained("microsoft/trocr-base-handwritten")
+processor = TrOCRProcessor.from_pretrained("microsoft/trocr-large-handwritten")
+model = VisionEncoderDecoderModel.from_pretrained("microsoft/trocr-large-handwritten")
 
 def extract_text_from_image(cropped_image):
+
     # Convertir l'image PIL en tensor de pixels pour le modèle TrOCR
     pixel_values = processor(cropped_image, return_tensors="pt").pixel_values
 
@@ -64,9 +65,7 @@ def draw_boxes_on_image_trocr(image, json_data, nb_ocr):
                 if extracted_text != "No text found in the image.":
                     strings.append(extracted_text)
                     data_dict[label] = extracted_text
-                    color = "green"
                 else:
-                    color = "red"
                     data_dict[label] = ''
             except Exception as e:
                 print(f"An error occurred: {e}")
