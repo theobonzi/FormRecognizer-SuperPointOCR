@@ -23,7 +23,7 @@ def extract_text_from_image_google(image, language_hints='fr', bounding_poly=Non
     Returns:
         str: Extracted text from the image.
     """
-    credentials_path = 'google-cloud-vision/mythical-temple-398110-51b8df2184f0.json'
+    credentials_path = 'src/ocr/google-cloud-vision/mythical-temple-398110-51b8df2184f0.json'
 
     # Specify the path to the service account key file
     credentials = service_account.Credentials.from_service_account_file(
