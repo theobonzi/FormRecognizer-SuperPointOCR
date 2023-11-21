@@ -242,7 +242,7 @@ def initialize_superpoint():
     """Initialize SuperPoint model."""
     print('==> Initializing SuperPoint...')
     start_time = time.time()
-    superpoint = SuperPointFrontend(weights_path='superpoint_v1.pth',
+    superpoint = SuperPointFrontend(weights_path='src/superpoint/superpoint_v1.pth',
                                     nms_dist=4,
                                     conf_thresh=0.015,
                                     nn_thresh=0.7,

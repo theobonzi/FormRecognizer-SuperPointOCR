@@ -4,7 +4,7 @@ from io import BytesIO
 import pandas as pd
 import numpy as np
 from PIL import Image, ImageDraw
-from ocr_google import extract_text_from_image_google
+from src.ocr.ocr_google import extract_text_from_image_google
 
 def draw_boxes_on_image(image, json_data, nb_ocr):
     if isinstance(image, np.ndarray):
@@ -63,11 +63,7 @@ def draw_boxes_on_image(image, json_data, nb_ocr):
     df = pd.DataFrame([data_dict])
     return image, strings, df
 
-def image_to_byte_array(image: Image.Image) -> bytes:
-    img_byte_arr = BytesIO()
-    image = image.convert('RGB')
-    image.save(img_byte_arr, format='JPEG')
-    return img_byte_arr.getvalue()
+
 
 def draw_boxes(img_path, good_forms, nb_ocr=0):
     base_path = "json_labels"
