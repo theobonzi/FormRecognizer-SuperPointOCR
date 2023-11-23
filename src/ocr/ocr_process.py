@@ -8,7 +8,7 @@ import tqdm
 from src.ocr.ocr_trocr import draw_boxes_on_image_trocr
 from src.ocr.ocr_google import draw_boxes_on_image_google
 
-def draw_boxes(ocr, img_path, good_forms, nb_ocr=0):
+def draw_boxes(ocr, img_path, good_forms, nb_ocr=0, model=None, processor=None):
     base_path = "json_labels"
     image_file_name = f"{good_forms}.json"
     
@@ -21,7 +21,7 @@ def draw_boxes(ocr, img_path, good_forms, nb_ocr=0):
         img, strings, df = draw_boxes_on_image_google(img_path, data, nb_ocr)
     elif ocr == 'trocr':
         
-        img, strings, df = draw_boxes_on_image_trocr(img_path, data, nb_ocr)
+        img, strings, df = draw_boxes_on_image_trocr(img_path, data, nb_ocr, model, processor)
         
     return img, strings, df
 

@@ -31,14 +31,14 @@ python run.py -preprocess <chemin_vers_donnees> [--force]
 ```
 
 ### Inference
-Pour réaliser une inférence sur des fichiers ou des dossiers Excel :
+Pour réaliser une inférence sur un fichier ou plusieurs formulaires à partir d'un fichier Excel :
 
-- Sur des fichiers :
+- Sur un fichier :
 ```bash
 python run.py -inference_file <chemin_vers_fichier> [-nb_ocr <nombre>] [-benchmark]
 ```
 
-- Sur des dossiers Excel :
+- A partir d'un fichier Excel :
 ```bash
 python run.py -inference_excel [-nb_files <nombre>] [-nb_ocr <nombre>] [-ocr <google|trocr>] [-benchmark]
 ```

@@ -10,6 +10,7 @@ from src.process.process import process_single_image, resise_image, display_imag
 from src.ocr.ocr_process import draw_boxes
 from src.process.train_process import load_models
 from src.superpoint.superpoint import initialize_superpoint
+from transformers import TrOCRProcessor, VisionEncoderDecoderModel
 
 def find_best_match(image_path, trained_models, superpoint):
     max_matches = 0
@@ -84,6 +85,12 @@ def run_all(path_model, ocr, nb_forms=20, nb_ocr=5, verbose=False):
 
     df =None
 
+    model = None
+    processor = None
+    if ocr == 'trocr':
+        processor = TrOCRProcessor.from_pretrained("microsoft/trocr-small-handwritten")
+        model = VisionEncoderDecoderModel.from_pretrained("microsoft/trocr-small-handwritten")
+
     for spi, path_recto in dict_spi_path.items():
         if counter >= nb_forms:
             break
@@ -114,8 +121,8 @@ def run_all(path_model, ocr, nb_forms=20, nb_ocr=5, verbose=False):
             #Todo OCR
             #with contextlib.redirect_stdout(temp_stdout):
             print(ocr)
-            img_R, strings_R, df_R = draw_boxes(ocr, image_R, match_form_R, nb_ocr)
-            img_V, strings_V, df_V = draw_boxes(ocr, image_V, match_form_V, nb_ocr)
+            img_R, strings_R, df_R = draw_boxes(ocr, image_R, match_form_R, nb_ocr, model=model, processor=processor)
+            img_V, strings_V, df_V = draw_boxes(ocr, image_V, match_form_V, nb_ocr, model=model, processor=processor)
 
             if verbose:
                 display_images(img_R, img_V, title1=match_form_R, title2=match_form_V)
