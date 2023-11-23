@@ -1,13 +1,11 @@
 import pandas as pd
 import numpy as np
 from PIL import Image, ImageDraw
-from transformers import TrOCRProcessor, VisionEncoderDecoderModel
-import concurrent.futures
+import time
+import tqdm
 
-processor = TrOCRProcessor.from_pretrained("microsoft/trocr-base-handwritten")
-model = VisionEncoderDecoderModel.from_pretrained("microsoft/trocr-base-handwritten")
+def extract_text_from_image(cropped_image, model, processor):
 
-def extract_text_from_image(cropped_image):
     # Convertir l'image PIL en tensor de pixels pour le modèle TrOCR
     pixel_values = processor(cropped_image, return_tensors="pt").pixel_values
 
@@ -17,14 +15,9 @@ def extract_text_from_image(cropped_image):
     # Décoder les IDs en texte
     generated_text = processor.batch_decode(generated_ids, skip_special_tokens=True)[0]
 
-    print(f"Extracted text: {generated_text[:50]}")  # Imprime les 50 premiers caractères du texte extrait
-    if len(generated_text) > 50:
-        print("...")
+    return generated_text.strip() or ""
 
-    return generated_text.strip() or "No text found in the image."
-
-
-def draw_boxes_on_image_trocr(image, json_data, nb_ocr):
+def draw_boxes_on_image_trocr(image, json_data, nb_ocr, model, processor):
     if isinstance(image, np.ndarray):
         image = Image.fromarray(image)
     elif isinstance(image, str):
@@ -33,14 +26,17 @@ def draw_boxes_on_image_trocr(image, json_data, nb_ocr):
     draw = ImageDraw.Draw(image)
     strings = []
     data_dict = {}
-    cropped_images = []
-
+    images = []
+    labels_list = []
+    start = time.time()
+    i = 0
     # Préparer la liste des images recadrées pour le traitement OCR
     for item in json_data:
         for annotation in item['annotations']:
-            for result in annotation['result']:
+            for result in tqdm.tqdm(annotation['result'], desc='Select boxes for ocr'):
                 if result['type'] == 'labels':
-
+                    if (i > nb_ocr):
+                        break
                     value = result['value']
                     x = value['x'] * image.width / 100
                     y = value['y'] * image.height / 100
@@ -49,28 +45,13 @@ def draw_boxes_on_image_trocr(image, json_data, nb_ocr):
                     padding = 5
 
                     cropped = image.crop((x - padding, y - padding, x + width + padding, y + height + padding))
+                    images.append(cropped)
                     labels = value['labels']
-                    if labels:  # Assurez-vous que les étiquettes existent avant de les ajouter.
-                        cropped_images.append((cropped, labels[0]))
+                    if labels:
+                        extracted_text = extract_text_from_image(cropped, model, processor)
+                        data_dict[labels[0]] = extracted_text
 
-    print('start parallèle')
-    # Exécuter le traitement OCR en parallèle
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        future_to_ocr = {executor.submit(extract_text_from_image, img): label for img, label in cropped_images}
-        for future in concurrent.futures.as_completed(future_to_ocr):
-            label = future_to_ocr[future]
-            try:
-                extracted_text = future.result()
-                if extracted_text != "No text found in the image.":
-                    strings.append(extracted_text)
-                    data_dict[label] = extracted_text
-                    color = "green"
-                else:
-                    color = "red"
-                    data_dict[label] = ''
-            except Exception as e:
-                print(f"An error occurred: {e}")
-
+    print(f'END TIME: {time.time() - start} secondes')
     # Retourner l'image avec les boîtes dessinées, les chaînes extraites et le dataframe
     df = pd.DataFrame([data_dict])
     return image, strings, df
