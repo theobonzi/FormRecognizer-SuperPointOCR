@@ -3,21 +3,9 @@ import numpy as np
 from PIL import Image, ImageDraw
 import time
 import tqdm
+import pytesseract
 
-def extract_text_from_image(cropped_image, model, processor):
-
-    # Convertir l'image PIL en tensor de pixels pour le modèle TrOCR
-    pixel_values = processor(cropped_image, return_tensors="pt").pixel_values
-
-    # Générer les IDs à partir du modèle
-    generated_ids = model.generate(pixel_values, max_new_tokens=100)
-
-    # Décoder les IDs en texte
-    generated_text = processor.batch_decode(generated_ids, skip_special_tokens=True)[0]
-
-    return generated_text.strip() or ""
-
-def draw_boxes_on_image_trocr(image, json_data, nb_ocr, model, processor):
+def draw_boxes_on_image_tesseract(image, json_data, nb_ocr):
     if isinstance(image, np.ndarray):
         image = Image.fromarray(image)
     elif isinstance(image, str):
@@ -30,12 +18,13 @@ def draw_boxes_on_image_trocr(image, json_data, nb_ocr, model, processor):
     labels_list = []
     start = time.time()
     i = 0
+
     # Préparer la liste des images recadrées pour le traitement OCR
     for item in json_data:
         for annotation in item['annotations']:
             for result in tqdm.tqdm(annotation['result'], desc='Select boxes for ocr'):
                 if result['type'] == 'labels':
-                    if (i > nb_ocr):
+                    if i > nb_ocr:
                         break
                     value = result['value']
                     x = value['x'] * image.width / 100
@@ -48,12 +37,10 @@ def draw_boxes_on_image_trocr(image, json_data, nb_ocr, model, processor):
                     images.append(cropped)
                     labels = value['labels']
                     if labels:
-                        extracted_text = extract_text_from_image(cropped, model, processor)
+                        extracted_text = pytesseract.image_to_string(cropped, lang='fra').strip()
                         data_dict[labels[0]] = extracted_text
-                        #print("prediction: ", extracted_text)
-                    i+=1
+                    i += 1
 
     print(f'END TIME: {time.time() - start} secondes')
-    # Retourner l'image avec les boîtes dessinées, les chaînes extraites et le dataframe
     df = pd.DataFrame([data_dict])
     return image, strings, df

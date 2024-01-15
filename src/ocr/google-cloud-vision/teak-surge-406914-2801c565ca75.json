@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "teak-surge-406914",
+  "private_key_id": "2801c565ca75d22783abeb499cd9047c1fd46455",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC5KtdDskUJUbxs\nP/JX3KSazRl/X3AL7VxWWGnJ9HcTrfW5fNcbkFbJYssGnvvmp0rOByHnhS+jX9cK\nNXeYC6PSnaUB+zm3hYQPt7tfzImqXoJQEyoW3IvT9su+Ndh49hip6fj0IpEoNgbi\n++nmkFobmWIj2srduhXA/ecQ6sDxQKCtrKW0mYwbXRa+BZVFdY3DysHIKRF9OitK\nvKvomdqhDDYA6DC/cINoCTQ10zzbOM9Ttb05nuWHJFCQe436v6q0MHHLgpp1ufBS\nNDq7PBEW7ncUyfGRQW9JMfvliryshY5x+YhKW58OWwJELVlaKRUoQptbdFFY5YH/\n5QN72tqNAgMBAAECggEAHMUsCMPuZ5YIU351ElNBTR8gftKul1/UOMNIfp1KEif1\nldIwnwMEhQphVsBFje9A13WyviUKw5Ts1dR8Zkaqt9sQLBhjfaEUZZfL2ITwf+Tq\n1PPBVqeCX1cJjZ6Sqaq9Jstoh9BGIwwP8l0nWNBle8PPhJgmbKCQ6DlbGV0MSP+Y\nE0McQnWymrw76lWxyOts94F2vlfLU3JqEWsQoW8tyUa0z+Y2Owm3kO9NaPqtW1S7\nHKKFrCHn4WFKU8Z0hEyOlJ5DSEr3j7Piv6e1RrTiMv4iUPA8vRbzqOJZVeQWxpJE\nN67U/iY2AYtyKkB4uaywBx2YGQF0DFjNzNdiRVkuiQKBgQD6o/7STFXpaYShp7tD\nQSo3rFyTy2p8R47PKCe1OhI2MQshzf+rSrMm/yNAMe2kUwblbDAipykw65HUXUFl\nlTXzp1+EZZxITZGxDPBxoqJSdtAk/e5AQ+15NhIJVF8pwnEsc1UklZdgIPMmCgvA\nkcLa/qrw7WrzztNl+X/xtTTitQKBgQC9IHIFrI9Bt3mMSKZ+xtOdEKaFB1vu779Y\npQ7bOnEcYMG0ILsm48sKhe0kGIKKNT3TUafZnuifZpcpkVcMrdcgNwMfegS4Mrez\nTKt167OpHu59QPk6cR33MpTqK53osJ6seZDOjc/9JAMfgSf6D34jFqCKkWU/GWHF\nGQz+Mr3HeQKBgQC7U9LirrcPSxQcFlb5vzyke6h9te0SkhEEd4imBI8T/bfKPkK2\nbZBUtyBLnIV26a8fzap0W+eHbqmBxWlZWRoHz7KuK5uQ1pjrcTZMWDdl1vNekoN9\neMeGbokwe+TcOz2G8XRTcZLAACB678s01DyEnQ56H5huPMj3UHD14G90eQKBgAQM\nfMRoVEzI275IE+Bk60TShW4VoT81PLhuGCpTTvaXj64GgVssxzz7bv810x2YVDGA\n7wH2p+45qQTHysBHvHJBGz0CRLWYyFv7STRmDluRgPOHf45ju4t+NrfopSHFHjB9\nDb+OQ6Scr8Bt6GgvCrk/k8JDqJI4PeKVTbTnay6pAoGAYHjAiQf7pAKawOQEZ+8Z\nVh0fddp6plKQkzoz8H8MGkAZFl4YNmQlbk75CYuvP3HOOxUEibhkhZEFhDc79CgI\nOYsVfoe1kEQxUIRqlQw2rdO5AomzCze1qJQwYs66kYtkInFDWCtw4PbKaOgLkaHL\nAgTqUfLRfHeH7aR5cTW47+E=\n-----END PRIVATE KEY-----\n",
+  "client_email": "dgfip-877@teak-surge-406914.iam.gserviceaccount.com",
+  "client_id": "104704465541163384392",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/dgfip-877%40teak-surge-406914.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

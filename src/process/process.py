@@ -147,10 +147,8 @@ def create_paths(df):
     try:
         # Iterating over rows in the DataFrame
         for index, row in df.iterrows():
-            if row['SPI'] != '0000000000000':
-                # Concatenating 'Lot' and 'Image' values using os.path.join
                 path = os.path.join(str(row['Lot']), str(row['Image']))
-                paths_dict[row['SPI']] = path
+                paths_dict[index] = path
 
                 
     except KeyError as e:

@@ -78,10 +78,10 @@ def inference(test_image_path, path_models):
 
     return best_matching_form, keypoints, img
 
-def run_all(path_model, ocr, nb_forms=20, nb_ocr=5, verbose=False):
+def run_all(path, path_model, ocr, nb_forms=20, nb_ocr=5, verbose=False):
     counter = 0
 
-    dict_spi_path = get_paths_dict()
+    dict_spi_path = get_paths_dict(path)
 
     df =None
 
@@ -94,7 +94,7 @@ def run_all(path_model, ocr, nb_forms=20, nb_ocr=5, verbose=False):
     for spi, path_recto in dict_spi_path.items():
         if counter >= nb_forms:
             break
-
+        print(f"=====> {counter}/{nb_forms}")
         path_verso = re.sub(r'_R\.jpg$', '_V.jpg', path_recto)
 
         print(spi)
@@ -117,24 +117,20 @@ def run_all(path_model, ocr, nb_forms=20, nb_ocr=5, verbose=False):
             
         print(match_form_R)
 
-        if match_form_R != '2042_Kauto_recto':
-            #Todo OCR
-            #with contextlib.redirect_stdout(temp_stdout):
-            print(ocr)
-            img_R, strings_R, df_R = draw_boxes(ocr, image_R, match_form_R, nb_ocr, model=model, processor=processor)
-            img_V, strings_V, df_V = draw_boxes(ocr, image_V, match_form_V, nb_ocr, model=model, processor=processor)
+        img_R, strings_R, df_R = draw_boxes(ocr, image_R, match_form_R, nb_ocr, model=model, processor=processor)
+        img_V, strings_V, df_V = draw_boxes(ocr, image_V, match_form_V, nb_ocr, model=model, processor=processor)
 
-            if verbose:
-                display_images(img_R, img_V, title1=match_form_R, title2=match_form_V)
+        if verbose:
+            display_images(img_R, img_V, title1=match_form_R, title2=match_form_V)
 
-            #Todo Concatener les 2 resultats dans 1 seul dataframe avec les bons labels
-            df_concatenated = pd.concat([df_R.reset_index(drop=True), df_V.reset_index(drop=True)], axis=1)
-            df = df_concatenated
+        #Todo Concatener les 2 resultats dans 1 seul dataframe avec les bons labels
+        df_concatenated = pd.concat([df_R.reset_index(drop=True), df_V.reset_index(drop=True)], axis=1)
+        df = df_concatenated
 
-            sheet_name = choose_good_excel(match_form_R)
+        sheet_name = choose_good_excel(match_form_R)
 
-            #Todo Remplir le bon excel
-            append_df_to_excel(df_concatenated, excel_path='./data/excel/Acquisition.xlsx', sheet_name=sheet_name)
+        #Todo Remplir le bon excel
+        append_df_to_excel(df_concatenated, excel_path=f'./data/excel/Acquisition_{ocr}.xlsx', sheet_name=sheet_name)
 
-            counter += 1
+        counter += 1
     return df

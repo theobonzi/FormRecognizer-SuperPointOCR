@@ -16,7 +16,6 @@ def draw_boxes_on_image_google(image, json_data, nb_ocr):
     elif isinstance(image, str):
         image = Image.open(image)
 
-    draw = ImageDraw.Draw(image)
     strings = []
     data_dict = {}
 
@@ -26,49 +25,80 @@ def draw_boxes_on_image_google(image, json_data, nb_ocr):
                 if result['type'] == 'labels':
 
                     value = result['value']
-                    labels = value['labels']
-                    
-                    x = value['x'] * image.width / 100
-                    y = value['y'] * image.height / 100
-                    width = value['width'] * image.width / 100
-                    height = value['height'] * image.height / 100
-                    
-                    #print('x:', x)
-                    #print('y:', y)
-                    #print('width:', width)
-                    #print('height:', height)
+                    x, y, width, height = [value[key] * image.size[i % 2] / 100 for i, key in enumerate(['x', 'y', 'width', 'height'])]
 
                     padding = 5
-                    # Cropper l'image selon le rectangle
-                    cropped = image.crop((x - padding, y - padding, x-padding + width+padding, y-padding + height+padding))
-                        
-                    # Extraire le texte de l'image recadrée
-                    extracted_text = "No text found in the image."
-                        
-                    if (len(strings) < nb_ocr):
-                        #print('labels:', labels)
+                    cropped = image.crop((x - padding, y - padding, x + width + padding, y + height + padding))
+
+                    if len(strings) < nb_ocr:
                         extracted_text = extract_text_from_image_google(cropped)
                         strings.append(extracted_text)
-                        #print(extracted_text)
 
-                    # Choisir la couleur en fonction du texte extrait
-                    if extracted_text == "No text found in the image.":
-                        color = "red"
-                        data_dict[labels[0]] = ''
-                    else:
-                        color = "green"
-                        if (len(strings) < nb_ocr):
-                            if len(labels) > 0 and labels[0] not in data_dict:
-                                extracted_text = extract_text_from_image_google(cropped)
-                                data_dict[labels[0]] = extracted_text
-
-                    # Dessiner le rectangle avec la couleur appropriée
-                    draw.rectangle([(x - padding, y - padding), (x-padding + width+padding, y-padding + height+padding)], outline=color)
+                        if value['labels'][0] not in data_dict:
+                            data_dict[value['labels'][0]] = extracted_text
     
     df = pd.DataFrame([data_dict])
     return image, strings, df
 
-def extract_text_from_image_google(image, language_hints='fr', bounding_poly=None):
+# def teeeeeeeest(image, json_data, nb_ocr):
+#     if isinstance(image, np.ndarray):
+#         image = Image.fromarray(image)
+#     elif isinstance(image, str):
+#         image = Image.open(image)
+
+#     draw = ImageDraw.Draw(image)
+#     strings = []
+#     data_dict = {}
+
+#     for item in json_data:
+#         for annotation in item['annotations']:
+#             for result in tqdm.tqdm(annotation['result'], desc='ocr process: '):
+#                 if result['type'] == 'labels':
+
+#                     value = result['value']
+#                     labels = value['labels']
+                    
+#                     x = value['x'] * image.width / 100
+#                     y = value['y'] * image.height / 100
+#                     width = value['width'] * image.width / 100
+#                     height = value['height'] * image.height / 100
+                    
+#                     #print('x:', x)
+#                     #print('y:', y)
+#                     #print('width:', width)
+#                     #print('height:', height)
+
+#                     padding = 5
+#                     # Cropper l'image selon le rectangle
+#                     cropped = image.crop((x - padding, y - padding, x-padding + width+padding, y-padding + height+padding))
+                        
+#                     # Extraire le texte de l'image recadrée
+#                     extracted_text = "No text found in the image."
+                        
+#                     if (len(strings) < nb_ocr):
+#                         #print('labels:', labels)
+#                         extracted_text = extract_text_from_image_google(cropped)
+#                         strings.append(extracted_text)
+#                         #print(extracted_text)
+
+#                     # Choisir la couleur en fonction du texte extrait
+#                     if extracted_text == "No text found in the image.":
+#                         color = "red"
+#                         data_dict[labels[0]] = ''
+#                     else:
+#                         color = "green"
+#                         if (len(strings) < nb_ocr):
+#                             if len(labels) > 0 and labels[0] not in data_dict:
+#                                 extracted_text = extract_text_from_image_google(cropped)
+#                                 data_dict[labels[0]] = extracted_text
+
+#                     # Dessiner le rectangle avec la couleur appropriée
+#                     draw.rectangle([(x - padding, y - padding), (x-padding + width+padding, y-padding + height+padding)], outline=color)
+    
+#     df = pd.DataFrame([data_dict])
+#     return image, strings, df
+
+def extract_text_from_image_google(image, language_hints='fr-t-i0-handwrit', bounding_poly=None):
     """
     Extracts text from an image file using Google Cloud Vision API.
 
@@ -81,7 +111,7 @@ def extract_text_from_image_google(image, language_hints='fr', bounding_poly=Non
     Returns:
         str: Extracted text from the image.
     """
-    credentials_path = 'src/ocr/google-cloud-vision/mythical-temple-398110-51b8df2184f0.json'
+    credentials_path = 'src/ocr/google-cloud-vision/teak-surge-406914-2801c565ca75.json'
 
     # Specify the path to the service account key file
     credentials = service_account.Credentials.from_service_account_file(
@@ -111,7 +141,7 @@ def extract_text_from_image_google(image, language_hints='fr', bounding_poly=Non
     if texts:
         return texts[0].description
     else:
-        return "No text found in the image."
+        return "" # No text found in the image.
     
 def image_to_byte_array(image: Image.Image) -> bytes:
     img_byte_arr = BytesIO()
