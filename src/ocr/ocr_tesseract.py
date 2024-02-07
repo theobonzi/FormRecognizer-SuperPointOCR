@@ -19,7 +19,6 @@ def draw_boxes_on_image_tesseract(image, json_data, nb_ocr):
     start = time.time()
     i = 0
 
-    # Préparer la liste des images recadrées pour le traitement OCR
     for item in json_data:
         for annotation in item['annotations']:
             for result in tqdm.tqdm(annotation['result'], desc='Select boxes for ocr'):

@@ -31,7 +31,6 @@ def find_best_match(image_path, trained_models, superpoint):
         desc_ref = model_data['desc']
         kp_ref = model_data['kp']
 
-        ###Good matches
         matches = bf.knnMatch(np.float32(descriptors).T, np.float32(desc_ref).T, k=2)
         good_matches = [m for m, n in matches if m.distance < 0.70 * n.distance]
 
@@ -83,7 +82,7 @@ def run_all(path, path_model, ocr, nb_forms=20, nb_ocr=5, verbose=False):
 
     dict_spi_path = get_paths_dict(path)
 
-    df =None
+    df = None
 
     model = None
     processor = None
@@ -103,8 +102,6 @@ def run_all(path, path_model, ocr, nb_forms=20, nb_ocr=5, verbose=False):
         print(f'Recto: {path_recto} | File exist: {os.path.exists(new_recto)}')
         print(f'Recto: {path_verso} | File exist: {os.path.exists(new_verso)}')
 
-        #Todo Inference on new_recto and new_verso
-        ##RECTO
         temp_stdout = io.StringIO()
         with contextlib.redirect_stdout(temp_stdout):
             match_form_R, keypoints_R, image_R = inference(test_image_path=new_recto, path_models=path_model)
@@ -123,13 +120,11 @@ def run_all(path, path_model, ocr, nb_forms=20, nb_ocr=5, verbose=False):
         if verbose:
             display_images(img_R, img_V, title1=match_form_R, title2=match_form_V)
 
-        #Todo Concatener les 2 resultats dans 1 seul dataframe avec les bons labels
         df_concatenated = pd.concat([df_R.reset_index(drop=True), df_V.reset_index(drop=True)], axis=1)
         df = df_concatenated
 
         sheet_name = choose_good_excel(match_form_R)
 
-        #Todo Remplir le bon excel
         append_df_to_excel(df_concatenated, excel_path=f'./data/excel/Acquisition_{ocr}.xlsx', sheet_name=sheet_name)
 
         counter += 1

@@ -13,11 +13,9 @@ def interface():
     results_path = "./results"
     if check_files_in_directory(results_path):
         if st.button("Lancer Benchmark"):
-            run_bench('./data/excel/verite_terrain.ods', './data/excel/Acquisition.ods')
-            # Démarrer le serveur Dash dans un thread séparé
+
             threading.Thread(target=run_dash_server, daemon=True).start()
-            # Construire l'URL du serveur Dash
-            dash_url = "http://localhost:8080"  # Assurez-vous que le port est correct
+            dash_url = "http://localhost:8080"
             st.markdown(f"Benchmark lancé! [Ouvrez ici]({dash_url}).")
     else:
         st.write("Aucun fichier de résultat trouvé pour le benchmark.")
@@ -32,7 +30,6 @@ def interface():
 
     # Section Inférence (Fichier)
     st.header("Inférence - Fichier")
-    #inference_file_path = st.text_input("Chemin pour inference file:")
     inference_file_path = st.file_uploader("Chemin pour inference file:", type=['png', 'jpg', 'jpeg'])
     ocr_file = st.selectbox("OCR à utiliser:", ['google', 'trocr', 'tesseract'], key='ocr_file')
     nb_ocr_file = st.number_input("Nombre d'OCR à traiter (fichier):", min_value=1, value=5)
@@ -63,7 +60,6 @@ def execute_preprocess(path, force=False):
     st.write(f"Exécution de preprocess sur {path}")
     if force:
         st.write("Option --force activée")
-    # Appel à la fonction process_train (à implémenter)
     process_train(path, force)
 
 def execute_inference_excel(path_excel, nb_files, nb_ocr, ocr, benchmark=False):
@@ -73,7 +69,6 @@ def execute_inference_excel(path_excel, nb_files, nb_ocr, ocr, benchmark=False):
     print(df)
     st.dataframe(df)
 
-    # convert acquisition excel to ods
     acquisition_path = './data/excel/Acquisition.xlsx'
     acquisition_ods_path = './data/excel/Acquisition.ods'
     os.system(f'libreoffice --headless --convert-to ods {acquisition_path} --outdir ./data/excel')
@@ -83,12 +78,9 @@ def execute_inference_excel(path_excel, nb_files, nb_ocr, ocr, benchmark=False):
 
 def execute_inference_file(uploaded_file, nb_ocr, ocr, benchmark=False):
     if uploaded_file is not None:
-        # Créer un dossier temporaire pour enregistrer le fichier
         with tempfile.TemporaryDirectory() as temp_dir:
-            # Construire le chemin complet du fichier temporaire
             temp_file_path = os.path.join(temp_dir, uploaded_file.name)
 
-            # Écrire le fichier téléchargé dans le fichier temporaire
             with open(temp_file_path, "wb") as f:
                 f.write(uploaded_file.getbuffer())
 
@@ -96,11 +88,8 @@ def execute_inference_file(uploaded_file, nb_ocr, ocr, benchmark=False):
             if benchmark:
                 st.write("Benchmark activé")
 
-            # Utiliser le chemin du fichier temporaire pour l'inférence
             df = process_inference_file(temp_file_path, nb_ocr, ocr)
             st.dataframe(df)
-
-            # Le fichier et le répertoire temporaire seront nettoyés après la sortie du bloc with
     else:
         st.error("Aucun fichier fourni.")
 

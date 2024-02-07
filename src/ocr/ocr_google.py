@@ -40,64 +40,6 @@ def draw_boxes_on_image_google(image, json_data, nb_ocr):
     df = pd.DataFrame([data_dict])
     return image, strings, df
 
-# def teeeeeeeest(image, json_data, nb_ocr):
-#     if isinstance(image, np.ndarray):
-#         image = Image.fromarray(image)
-#     elif isinstance(image, str):
-#         image = Image.open(image)
-
-#     draw = ImageDraw.Draw(image)
-#     strings = []
-#     data_dict = {}
-
-#     for item in json_data:
-#         for annotation in item['annotations']:
-#             for result in tqdm.tqdm(annotation['result'], desc='ocr process: '):
-#                 if result['type'] == 'labels':
-
-#                     value = result['value']
-#                     labels = value['labels']
-                    
-#                     x = value['x'] * image.width / 100
-#                     y = value['y'] * image.height / 100
-#                     width = value['width'] * image.width / 100
-#                     height = value['height'] * image.height / 100
-                    
-#                     #print('x:', x)
-#                     #print('y:', y)
-#                     #print('width:', width)
-#                     #print('height:', height)
-
-#                     padding = 5
-#                     # Cropper l'image selon le rectangle
-#                     cropped = image.crop((x - padding, y - padding, x-padding + width+padding, y-padding + height+padding))
-                        
-#                     # Extraire le texte de l'image recadrée
-#                     extracted_text = "No text found in the image."
-                        
-#                     if (len(strings) < nb_ocr):
-#                         #print('labels:', labels)
-#                         extracted_text = extract_text_from_image_google(cropped)
-#                         strings.append(extracted_text)
-#                         #print(extracted_text)
-
-#                     # Choisir la couleur en fonction du texte extrait
-#                     if extracted_text == "No text found in the image.":
-#                         color = "red"
-#                         data_dict[labels[0]] = ''
-#                     else:
-#                         color = "green"
-#                         if (len(strings) < nb_ocr):
-#                             if len(labels) > 0 and labels[0] not in data_dict:
-#                                 extracted_text = extract_text_from_image_google(cropped)
-#                                 data_dict[labels[0]] = extracted_text
-
-#                     # Dessiner le rectangle avec la couleur appropriée
-#                     draw.rectangle([(x - padding, y - padding), (x-padding + width+padding, y-padding + height+padding)], outline=color)
-    
-#     df = pd.DataFrame([data_dict])
-#     return image, strings, df
-
 def extract_text_from_image_google(image, language_hints='fr-t-i0-handwrit', bounding_poly=None):
     """
     Extracts text from an image file using Google Cloud Vision API.

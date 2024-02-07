@@ -51,9 +51,6 @@ def parse_command_line():
     if (args.benchmark) and not (args.inference_file):
         parser.error("L'option -benchmark ou -nb_ocr nécessite -inference.")
 
-    #if (args.benchmark | args.nb_ocr | args.nb_files) and not args.inference_excel:
-    #    parser.error("L'option -nb_files nécessite -inference_excel.")
-
     return args
 
 def main():

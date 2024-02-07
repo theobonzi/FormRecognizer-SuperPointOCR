@@ -17,7 +17,6 @@ def resise_image(image, scale_percent=40):
 
     width = 1970
     height = 1436
-    #print(f"==> Image resized : ({height}x{width})")
     dim = (width, height)
     resized_image = cv2.resize(image, dim)
     return resized_image
@@ -31,7 +30,6 @@ def process_single_image(image_path, superpoint, display=False, resize=40):
     image = np.float32(image) / 255.0
     
     resised_image = resise_image(image, resize)
-    #resised_image = image
     keypoints, descriptors, _ = superpoint.run(resised_image)
         
     if display:
@@ -95,29 +93,25 @@ def display_images(img1, img2, title1='Image 1', title2='Image 2'):
     :param title2: Title of the second image
     """
     
-    fig, axs = plt.subplots(1, 2, figsize=(20, 10))  # Create a figure and a set of subplots
+    fig, axs = plt.subplots(1, 2, figsize=(20, 10))
     
-    axs[0].imshow(img1, cmap='gray')  # Display the first image
-    axs[0].axis('off')  # Hide axes
-    axs[0].set_title(title1)  # Set title of the first image
+    axs[0].imshow(img1, cmap='gray')
+    axs[0].axis('off')
+    axs[0].set_title(title1)
     
-    axs[1].imshow(img2, cmap='gray')  # Display the second image
-    axs[1].axis('off')  # Hide axes
-    axs[1].set_title(title2)  # Set title of the second image
+    axs[1].imshow(img2, cmap='gray')
+    axs[1].axis('off')
+    axs[1].set_title(title2)
     
-    plt.tight_layout()  # Ensure the plots are displayed neatly without overlapping
-    plt.show()  # Display the images
+    plt.tight_layout()
+    plt.show()
 
 def append_df_to_excel(df, excel_path, sheet_name):
-    # Charger le classeur
     workbook = load_workbook(excel_path)
-    # Sélectionner la feuille de calcul
     sheet = workbook[sheet_name]
     
-    # Trouver la dernière rangée pour chaque colonne
     max_row_by_col = {}
     for column in df:
-        # Supposons que les colonnes dans le DataFrame correspondent aux entêtes des colonnes dans Excel
         max_row_by_col[column] = sheet.max_row
     
     # Obtenir les valeurs à ajouter depuis le DataFrame
