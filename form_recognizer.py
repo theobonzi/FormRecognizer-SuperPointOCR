@@ -29,4 +29,3 @@ def process_inference_excel(path_excel, ocr, nb_files, nb_ocr):
     df = run_all(path=path_excel, path_model='./data/forms_ref', ocr=ocr, nb_forms=nb_files, nb_ocr=nb_ocr)
     
     return df
-    #save_result_csv(df, file=False)        

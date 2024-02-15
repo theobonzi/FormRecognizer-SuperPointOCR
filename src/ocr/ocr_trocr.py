@@ -30,7 +30,6 @@ def draw_boxes_on_image_trocr(image, json_data, nb_ocr, model, processor):
     labels_list = []
     start = time.time()
     i = 0
-    # Préparer la liste des images recadrées pour le traitement OCR
     for item in json_data:
         for annotation in item['annotations']:
             for result in tqdm.tqdm(annotation['result'], desc='Select boxes for ocr'):
@@ -50,10 +49,8 @@ def draw_boxes_on_image_trocr(image, json_data, nb_ocr, model, processor):
                     if labels:
                         extracted_text = extract_text_from_image(cropped, model, processor)
                         data_dict[labels[0]] = extracted_text
-                        #print("prediction: ", extracted_text)
                     i+=1
 
     print(f'END TIME: {time.time() - start} secondes')
-    # Retourner l'image avec les boîtes dessinées, les chaînes extraites et le dataframe
     df = pd.DataFrame([data_dict])
     return image, strings, df

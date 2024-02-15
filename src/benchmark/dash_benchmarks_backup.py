@@ -28,7 +28,7 @@ def load_data():
     engines = ['google', 'trocr', 'tesseract']
     for form in forms:
         for engine in engines:
-            file_name = f"results/{form}_{engine}_results_f.csv"
+            file_name = f"results/{form}_{engine}_results_f.csv"  # Adjusted file name format
             dfs[(form, engine)] = pd.read_csv(file_name)
     return dfs
 
@@ -41,7 +41,7 @@ app = dash.Dash(__name__)
 app.layout = html.Div([
     dcc.Dropdown(
         id='engine-dropdown',
-        options=[{'label': engine, 'value': engine} for engine in ['google', 'trocr','tesseract']],
+        options=[{'label': engine, 'value': engine} for engine in ['google', 'trocr']],
         value='google'  # Default value
     ),
     dcc.Dropdown(
@@ -59,8 +59,8 @@ app.layout = html.Div([
         clearable=False
     ),
     dcc.Dropdown(
-        id='column-dropdown',
-        options=[],
+        id='column-dropdown',  # Ensure this ID matches exactly
+        options=[],  # Can be empty initially
         clearable=True,
         placeholder="Select a column or leave blank for all"
     ),
@@ -75,14 +75,18 @@ app.layout = html.Div([
 )
 def set_column_options(selected_form, selected_filter):
     try:
-        columns = data[(selected_form, 'google')].columns
+        columns = data[(selected_form, 'google')].columns  # Assuming columns are the same for both engines
         if selected_filter == 'checkboxes':
+            # Provide only the checkbox columns for the selected form
             options = [{'label': col, 'value': col} for col in checkbox_columns_dict.get(selected_form, [])]
         else:  # 'all' or individual columns
+            # Provide all columns
             options = [{'label': col, 'value': col} for col in columns]
 
+        # Debugging: Print options being returned
         return options
     except Exception as e:
+        # Log the exception
         return []  # Return an empty list in case of error
 
 @app.callback(
@@ -137,6 +141,7 @@ def update_display(selected_engine, selected_form, selected_filter, selected_col
         'layout': {'title': 'Other Match Types'}
     }
 
+    # Container for the first two charts
     top_row = html.Div([
         html.Div(dcc.Graph(figure=fig1), style={'display': 'inline-block', 'width': '50%'}),
         html.Div(dcc.Graph(figure=fig2), style={'display': 'inline-block', 'width': '50%'})
@@ -149,6 +154,7 @@ def update_display(selected_engine, selected_form, selected_filter, selected_col
         html.H4(f"Total Forms Processed: {total_forms_processed}"),
     ], style={'margin-top': '20px', 'margin-bottom': '20px'})
 
+    # Insert the forms_processed_display at the beginning of the figures list
     figures.insert(0, forms_processed_display)
 
     try:
